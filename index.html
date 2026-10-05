@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#243447">
+<title>ちょっとだけ前へ v1.1</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--navy:#243447;--navy2:#34495e;--bg:#f6f7f9;--card:#fff;--text:#263238;--muted:#7a858e;--line:#e4e8ec;--accent:#e0115f;--soft:#fceaf1;--good:#e8f4ee;--radius:20px}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP","Yu Gothic",sans-serif;line-height:1.55} button,input,select{font:inherit} button{cursor:pointer;border:0}
+.app{max-width:720px;margin:auto;padding:20px 16px 48px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.brand h1{font-size:22px;margin:0;color:var(--navy)}.brand p{font-size:12px;color:var(--muted);margin:2px 0 0}.tabs{display:flex;gap:6px;background:#e9edf1;padding:4px;border-radius:14px}.tab{background:transparent;color:var(--muted);padding:7px 11px;border-radius:10px;font-size:12px}.tab.active{background:white;color:var(--navy);box-shadow:0 1px 5px #00000010;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:14px;box-shadow:0 4px 18px #26323808}.eyebrow{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.08em}.title{font-size:18px;font-weight:800;margin:4px 0 12px}.choices{display:flex;flex-wrap:wrap;gap:8px}.choice{background:#f2f4f6;color:#4f5b64;padding:9px 12px;border-radius:12px}.choice.active{background:var(--navy);color:white}.energy .choice.active{background:var(--accent)}
+.task{display:flex;gap:8px}.task input{flex:1;border:1px solid var(--line);border-radius:12px;padding:11px 12px;outline:none}.task input:focus{border-color:#b9c3cc}.suggest{background:var(--soft);color:#8f1749;border-radius:12px;padding:11px 13px;white-space:nowrap}
+.timegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.timebtn{padding:13px 8px;background:#f2f4f6;border-radius:13px;font-weight:700;color:#4f5b64}.timebtn.active{background:#dfe6ec;color:var(--navy)}
+.timer{text-align:center;padding:8px 0 2px}.clock{font-variant-numeric:tabular-nums;font-size:64px;font-weight:800;letter-spacing:-2px;color:var(--navy);margin:8px 0}.timerStatus{font-size:12px;color:var(--muted);min-height:20px}.adjust{display:flex;justify-content:center;gap:10px;align-items:center;margin:10px 0 15px}.adjust button{width:64px;height:42px;background:#f2f4f6;border-radius:12px;color:var(--navy);font-weight:800}.adjust .duration{min-width:74px;font-weight:800}.mainbtn{width:100%;padding:14px;border-radius:14px;background:var(--navy);color:white;font-weight:800;font-size:16px}.secondary{background:#eef1f3;color:var(--navy)}.danger{background:#fff0f3;color:#b32958}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#f7f8f9;border-radius:14px;padding:12px;text-align:center}.stat strong{display:block;font-size:20px;color:var(--navy)}.stat span{font-size:11px;color:var(--muted)}
+.hidden{display:none!important}.sectionTitle{display:flex;justify-content:space-between;align-items:end;margin:22px 0 8px}.sectionTitle h2{font-size:16px;margin:0}.sectionTitle span{font-size:11px;color:var(--muted)}
+canvas{width:100%;height:240px;display:block}.legend{display:flex;flex-wrap:wrap;gap:7px;font-size:11px;color:var(--muted)}.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}.log{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}.log:last-child{border-bottom:0}.logmain{min-width:0}.logtask{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.logmeta{font-size:11px;color:var(--muted)}.logmin{font-size:13px;font-weight:800;color:var(--navy);white-space:nowrap}.empty{text-align:center;color:var(--muted);font-size:13px;padding:28px 10px}
+.notice{background:var(--good);color:#276448;border-radius:12px;padding:10px 12px;font-size:12px;margin-top:10px}.footer{font-size:10px;color:#9aa2a8;text-align:center;margin-top:18px}
+@media(max-width:420px){.app{padding:16px 12px 40px}.clock{font-size:56px}.tabs{gap:2px}.tab{padding:7px 8px}.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand"><h1>ちょっとだけ前へ</h1><p>今日を完璧にするのではなく、1歩だけ進む。</p></div>
+    <div class="tabs"><button class="tab active" data-page="home">今日</button><button class="tab" data-page="history">記録</button></div>
+  </div>
+
+  <main id="homePage">
+    <section class="card">
+      <div class="eyebrow">01 / 今日の余力</div><div class="title">今の自分に近いものを選ぶ</div>
+      <div class="choices energy" id="energyChoices">
+        <button class="choice" data-energy="low">🪫 ほぼない</button><button class="choice active" data-energy="normal">△ ふつう</button><button class="choice" data-energy="high">🔋 余力あり</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="eyebrow">02 / やること</div><div class="title">今日はどの1歩にする？</div>
+      <div class="choices" id="categoryChoices">
+        <button class="choice active" data-category="英語">英語</button>
+        <button class="choice" data-category="アート花">アート花</button>
+        <button class="choice" data-category="デッサン">デッサン</button>
+        <button class="choice" data-category="薬剤師ブログ">薬剤師ブログ</button>
+        <button class="choice" data-category="デザイン">デザイン</button>
+        <button class="choice" data-category="読書">読書</button>
+        <button class="choice" data-category="その他">その他</button>
+      </div>
+      <div class="task" style="margin-top:12px"><input id="taskInput" placeholder="例：ハノンを3例文だけ声に出す"><button class="suggest" id="suggestBtn">1歩を提案</button></div>
+    </section>
+
+    <section class="card">
+      <div class="eyebrow">03 / 時間</div><div class="title">最初は小さく。途中で延長してOK。</div>
+      <div class="timegrid" id="timeChoices"><button class="timebtn" data-min="1">1分</button><button class="timebtn active" data-min="5">5分</button><button class="timebtn" data-min="15">15分</button></div>
+      <div class="timer">
+        <div class="clock" id="clock">05:00</div><div class="timerStatus" id="timerStatus">開始後も +5 / -5 分で調節できます</div>
+        <div class="adjust"><button id="minus5">−5分</button><div class="duration" id="duration">5分</div><button id="plus5">＋5分</button></div>
+        <button class="mainbtn" id="startBtn">この1歩を始める</button>
+        <button class="mainbtn secondary hidden" id="pauseBtn">一時停止</button>
+        <button class="mainbtn hidden" id="finishBtn" style="margin-top:8px">ここまでで記録する</button>
+      </div>
+      <div class="notice">途中でやめても失敗ではありません。実際に進んだ時間で記録できます。</div>
+    </section>
+
+    <section class="card">
+      <div class="eyebrow">今日の積み上げ</div><div class="stats"><div class="stat"><strong id="todaySteps">0</strong><span>今日の1歩</span></div><div class="stat"><strong id="todayMinutes">0</strong><span>今日の分数</span></div><div class="stat"><strong id="totalMinutes">0</strong><span>累計分数</span></div></div>
+    </section>
+  </main>
+
+  <main id="historyPage" class="hidden">
+    <section class="card"><div class="eyebrow">PAST DATA</div><div class="title">過去の進み方</div><p style="font-size:12px;color:var(--muted);margin-top:-4px">記録した実績を日別に表示します。空白の日があっても、そのままです。</p><canvas id="trendChart" width="680" height="240"></canvas></section>
+    <section class="card"><div class="eyebrow">項目別</div><div class="title">どの分野に時間を使った？</div><canvas id="categoryChart" width="680" height="240"></canvas><div class="legend" id="legend"></div></section>
+    <section class="card"><div class="sectionTitle"><h2>最近の記録</h2><span id="recordCount"></span></div><div id="logs"></div></section>
+    <section class="card"><button class="mainbtn danger" id="clearBtn">この端末の記録をすべて消す</button></section>
+  </main>
+  <div class="footer">データはこのブラウザ内に保存されます。サーバーには送信しません。</div>
+</div>
+<script>
+const KEY='chotto_dake_mae_v1_1_logs';
+let logs=load(); let energy='normal', category='英語', selectedMin=5, remaining=300, running=false, startedAt=null, timerId=null;
+const suggestions={
+ '英語':{low:'英語のハノンを1例文だけ声に出す',normal:'英語のハノンを3例文だけ声に出す',high:'英語のハノンを1セット練習する'},
+ 'アート花':{low:'花を1つだけ観察して形を描く',normal:'花の写真を1枚選び、形を3分観察する',high:'花を1輪、構図を考えて描く'},
+ 'デッサン':{low:'丸・四角を1つずつ描く',normal:'身近な物を5分だけ観察して描く',high:'モチーフを15分デッサンする'},
+ '薬剤師ブログ':{low:'記事の見出しを1つだけ書く',normal:'記事の構成を3項目だけ作る',high:'記事の導入を15分だけ書く'},
+ 'デザイン':{low:'参考にしたいデザインを1つ保存する',normal:'文字組みを1案だけ作る',high:'デザイン案を1枚仕上げる'},
+ '読書':{low:'本を1ページだけ読む',normal:'5分だけ読む',high:'15分だけ読む'},
+ 'その他':{low:'いちばん小さい作業を1つ決める',normal:'5分だけ進める',high:'15分だけ進める'}
+};
+const $=id=>document.getElementById(id);
+function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}}
+function save(){localStorage.setItem(KEY,JSON.stringify(logs))}
+function pad(n){return String(n).padStart(2,'0')}
+function fmt(sec){return `${pad(Math.floor(sec/60))}:${pad(sec%60)}`}
+function renderClock(){ $('clock').textContent=fmt(remaining); $('duration').textContent=Math.max(1,Math.ceil(remaining/60))+'分' }
+function setTaskSuggestion(){ $('taskInput').value=suggestions[category]?.[energy]||'5分だけ進める' }
+function resetRemaining(){remaining=selectedMin*60; renderClock(); $('timerStatus').textContent='開始後も +5 / -5 分で調節できます'}
+function setActive(group,attr,value){document.querySelectorAll(`[data-${attr}]`).forEach(b=>b.classList.toggle('active',b.dataset[attr]===value))}
+
+document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-page]').forEach(x=>x.classList.remove('active'));b.classList.add('active');const page=b.dataset.page;$('homePage').classList.toggle('hidden',page!=='home');$('historyPage').classList.toggle('hidden',page!=='history');if(page==='history')renderHistory()});
+document.querySelectorAll('[data-energy]').forEach(b=>b.onclick=()=>{energy=b.dataset.energy;setActive('','energy',energy);setTaskSuggestion()});
+document.querySelectorAll('[data-category]').forEach(b=>b.onclick=()=>{category=b.dataset.category;setActive('','category',category);setTaskSuggestion()});
+document.querySelectorAll('[data-min]').forEach(b=>b.onclick=()=>{if(running)return;selectedMin=+b.dataset.min;document.querySelectorAll('[data-min]').forEach(x=>x.classList.toggle('active',x===b));resetRemaining()});
+$('suggestBtn').onclick=setTaskSuggestion;
+$('plus5').onclick=()=>{remaining+=300;selectedMin=Math.ceil(remaining/60);renderClock();$('timerStatus').textContent='延長しました。さらに +5 分できます'};
+$('minus5').onclick=()=>{if(remaining>60){remaining=Math.max(60,remaining-300);selectedMin=Math.ceil(remaining/60);renderClock();$('timerStatus').textContent='短くしました'}else $('timerStatus').textContent='1分未満にはできません'};
+function start(){if(running)return;running=true;startedAt=Date.now();$('startBtn').classList.add('hidden');$('pauseBtn').classList.remove('hidden');$('finishBtn').classList.remove('hidden');$('timerStatus').textContent='進行中。余力が出たら +5 分';timerId=setInterval(()=>{remaining--;renderClock();if(remaining<=0){remaining=0;renderClock();finish(true)}},1000)}
+function pause(){if(!running)return;running=false;clearInterval(timerId);$('pauseBtn').classList.add('hidden');$('startBtn').classList.remove('hidden');$('startBtn').textContent='再開する';$('timerStatus').textContent='一時停止中。続けるなら再開できます'}
+function finish(auto=false){clearInterval(timerId);const elapsed=Math.max(1,Math.round((Date.now()-startedAt)/60000));let planned=selectedMin;let actual=auto?planned:Math.max(1,Math.min(planned,elapsed));if(auto)actual=planned;logs.push({id:Date.now(),date:new Date().toISOString(),category,task:$('taskInput').value.trim()||'作業',minutes:actual,planned});save();running=false;startedAt=null;remaining=selectedMin*60;renderClock();$('startBtn').classList.remove('hidden');$('startBtn').textContent='この1歩を始める';$('pauseBtn').classList.add('hidden');$('finishBtn').classList.add('hidden');$('timerStatus').textContent=auto?'時間になりました。1歩完了！':'記録しました。今日の1歩が増えました。';updateStats()}
+$('startBtn').onclick=start;$('pauseBtn').onclick=pause;$('finishBtn').onclick=()=>{if(confirm('ここまでの実績を記録しますか？'))finish(false)};
+function dateKey(d){const x=new Date(d);return `${x.getFullYear()}-${pad(x.getMonth()+1)}-${pad(x.getDate())}`}
+function updateStats(){const today=dateKey(new Date());const t=logs.filter(x=>dateKey(x.date)===today);$('todaySteps').textContent=t.length;$('todayMinutes').textContent=t.reduce((a,b)=>a+b.minutes,0);$('totalMinutes').textContent=logs.reduce((a,b)=>a+b.minutes,0)}
+function drawTrend(){const c=$('trendChart'),ctx=c.getContext('2d'),w=c.width=c.clientWidth*2,h=c.height=480;ctx.clearRect(0,0,w,h);ctx.font='22px sans-serif';ctx.fillStyle='#7a858e';const days=[];for(let i=13;i>=0;i--){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);days.push(d)}const vals=days.map(d=>{const k=dateKey(d);return logs.filter(x=>dateKey(x.date)===k).reduce((a,b)=>a+b.minutes,0)});const max=Math.max(10,...vals);const padX=52,padY=34,base=h-60,plotW=w-padX-24,plotH=base-padY;ctx.strokeStyle='#e4e8ec';ctx.lineWidth=2;for(let i=0;i<4;i++){const y=base-plotH*i/3;ctx.beginPath();ctx.moveTo(padX,y);ctx.lineTo(w-24,y);ctx.stroke();ctx.fillText(Math.round(max*i/3),8,y+7)}ctx.strokeStyle='#243447';ctx.lineWidth=5;ctx.beginPath();vals.forEach((v,i)=>{const x=padX+i*plotW/(vals.length-1),y=base-(v/max)*plotH;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();vals.forEach((v,i)=>{const x=padX+i*plotW/(vals.length-1),y=base-(v/max)*plotH;ctx.fillStyle='#e0115f';ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();if(i%2===0){ctx.fillStyle='#7a858e';ctx.font='20px sans-serif';ctx.fillText(`${days[i].getMonth()+1}/${days[i].getDate()}`,x-20,base+32)}});ctx.fillStyle='#243447';ctx.font='bold 22px sans-serif';ctx.fillText('分',8,24)}
+function drawCategory(){const c=$('categoryChart'),ctx=c.getContext('2d'),w=c.width=c.clientWidth*2,h=480;ctx.clearRect(0,0,w,h);const map={};logs.forEach(x=>map[x.category]=(map[x.category]||0)+x.minutes);const entries=Object.entries(map).sort((a,b)=>b[1]-a[1]);const max=Math.max(1,...entries.map(x=>x[1]));const left=180,barH=38,gap=22;entries.forEach(([name,val],i)=>{const y=30+i*(barH+gap);ctx.fillStyle='#7a858e';ctx.font='22px sans-serif';ctx.fillText(name,10,y+27);ctx.fillStyle='#e9edf1';ctx.fillRect(left,y,w-left-24,barH);ctx.fillStyle='#34495e';ctx.fillRect(left,y,(w-left-24)*val/max,barH);ctx.fillStyle='#243447';ctx.font='bold 20px sans-serif';ctx.fillText(`${val}分`,Math.min(w-70,left+(w-left-24)*val/max+10),y+27)});if(!entries.length){ctx.fillStyle='#7a858e';ctx.font='22px sans-serif';ctx.fillText('まだ記録がありません',20,50)}$('legend').innerHTML=entries.map(([n,v])=>`<span>${n}：${v}分</span>`).join('')}
+function renderLogs(){const el=$('logs');$('recordCount').textContent=`${logs.length}件`;if(!logs.length){el.innerHTML='<div class="empty">まだ記録がありません。<br>最初の1歩から始めましょう。</div>';return}el.innerHTML=[...logs].reverse().slice(0,30).map(x=>`<div class="log"><div class="logmain"><div class="logtask">${escapeHtml(x.task)}</div><div class="logmeta">${dateKey(x.date)} ・ ${escapeHtml(x.category)}</div></div><div class="logmin">${x.minutes}分</div></div>`).join('')}
+function escapeHtml(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function renderHistory(){drawTrend();drawCategory();renderLogs()}
+$('clearBtn').onclick=()=>{if(confirm('この端末に保存されている記録をすべて削除します。よろしいですか？')){logs=[];save();renderHistory();updateStats()}};
+setTaskSuggestion();resetRemaining();updateStats();
+window.addEventListener('resize',()=>{if(!$('historyPage').classList.contains('hidden'))renderHistory()});
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}</script>
+</body></html>

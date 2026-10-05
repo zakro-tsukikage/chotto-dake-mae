@@ -1,0 +1,9 @@
+{
+  "name": "ちょっとだけ前へ",
+  "short_name": "ちょっとだけ前へ",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f7f9",
+  "theme_color": "#243447",
+  "lang": "ja"
+}
